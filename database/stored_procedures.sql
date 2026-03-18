@@ -72,7 +72,8 @@ BEGIN
         SubCategoryId = @SubCategoryId,
         Title = @Title,
         DescriptionOfNote = @DescriptionOfNote,
-        StatusOfNote = @StatusOfNote
+        StatusOfNote = @StatusOfNote,
+        UpdatedDate = GETDATE()
     WHERE Id = @Id
 END
 GO
