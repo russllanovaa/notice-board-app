@@ -1,0 +1,14 @@
+﻿namespace NoticeBoardAPI.Models
+{
+    public class Announcement
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public int CategoryId { get; set; }
+        public int SubCategory {  get; set; }
+        public string Title { get; set; }  = string.Empty;
+        public string? DescriptionOfNote { get; set; }
+        public DateTime CreateDate { get; set; }
+        public string StatusOfNote { get; set; } = "active";
+    }
+}
