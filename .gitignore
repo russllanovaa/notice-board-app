@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 *.env
+appsettings.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -416,3 +417,13 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ASP.NET Core secrets
+**/appsettings.Development.json
+**/appsettings.Production.json
+
+# User secrets
+**/secrets.json
+
+# Example files should stay 
+!**/appsettings.example.json
