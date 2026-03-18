@@ -1,0 +1,6 @@
+@NoticeBoardAPI_HostAddress = http://localhost:5034
+
+GET {{NoticeBoardAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
