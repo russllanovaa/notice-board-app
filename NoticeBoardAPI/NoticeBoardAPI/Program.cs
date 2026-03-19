@@ -1,4 +1,6 @@
 using NoticeBoardAPI.Data;
+using NoticeBoardAPI.Repositories;
+using NoticeBoardAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<DbConnectionFactory>();
+builder.Services.AddScoped<AnnouncementRepository>();
+builder.Services.AddScoped<AnnouncementService>();
 
 var app = builder.Build();
 

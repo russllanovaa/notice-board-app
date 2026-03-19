@@ -9,6 +9,8 @@
         public string Title { get; set; }  = string.Empty;
         public string? DescriptionOfNote { get; set; }
         public DateTime CreateDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
         public string StatusOfNote { get; set; } = "active";
+       
     }
 }
