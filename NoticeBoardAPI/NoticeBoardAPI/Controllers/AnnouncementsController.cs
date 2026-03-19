@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NoticeBoardAPI.DTOs;
 using NoticeBoardAPI.Services;
+using System.Security.Claims;
 
 namespace NoticeBoardAPI.Controllers
 {
@@ -29,13 +31,16 @@ namespace NoticeBoardAPI.Controllers
             return Ok(announcement);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAnnouncementRequest request)
         {
-            await _announcementService.CreateAsync(1, request); //before auntification
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await _announcementService.CreateAsync(userId, request); 
             return Ok();    
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateAnnouncementRequest request)
         {
@@ -45,6 +50,7 @@ namespace NoticeBoardAPI.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
