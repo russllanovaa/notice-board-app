@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoticeBoardAPI", "NoticeBoardAPI\NoticeBoardAPI.csproj", "{546FCE50-32A9-4774-BE80-31C083F3FC1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoticeBoardMVC", "NoticeBoardMVC\NoticeBoardMVC.csproj", "{9031CDF4-3370-4103-817C-A318E2F5AB1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{546FCE50-32A9-4774-BE80-31C083F3FC1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{546FCE50-32A9-4774-BE80-31C083F3FC1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{546FCE50-32A9-4774-BE80-31C083F3FC1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9031CDF4-3370-4103-817C-A318E2F5AB1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9031CDF4-3370-4103-817C-A318E2F5AB1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9031CDF4-3370-4103-817C-A318E2F5AB1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9031CDF4-3370-4103-817C-A318E2F5AB1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
