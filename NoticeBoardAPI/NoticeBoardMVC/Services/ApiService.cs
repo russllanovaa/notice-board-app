@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using NoticeBoardMVC.Models;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -31,10 +32,11 @@ namespace NoticeBoardMVC.Services
             var responce = await httpClient.GetAsync(endpoint);
             if (!responce.IsSuccessStatusCode) return default;
             var content = await responce.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions
+            var result = JsonSerializer.Deserialize<ApiResponseViewModel<T>>(content, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
             });
+            return result != null && result.Success ? result.Data : default;
         }
 
         public async Task<HttpResponseMessage> PostAsync<T>(string endpoint, T data)
