@@ -1,4 +1,6 @@
-﻿namespace NoticeBoardAPI.Models
+﻿using NoticeBoardAPI.Enums;
+
+namespace NoticeBoardAPI.Models
 {
     public class Announcement
     {
@@ -10,7 +12,7 @@
         public string? DescriptionOfNote { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public string StatusOfNote { get; set; } = "active";
+        public AnnouncementStatus AnnouncementStatus { get; set; } = AnnouncementStatus.Active;
        
     }
 }

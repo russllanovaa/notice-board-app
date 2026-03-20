@@ -19,16 +19,19 @@ namespace NoticeBoardAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var announcement = await _announcementService.GetAllAsync();
-            return Ok(announcement);
+            var responce = await _announcementService.GetAllAsync();
+            return Ok(responce);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var announcement = await _announcementService.GetByIdAsync(id);
-            if (announcement == null) { return NotFound(); }
-            return Ok(announcement);
+            var responce = await _announcementService.GetByIdAsync(id);
+            if (!responce.Success)
+            {
+                return NotFound();
+            }
+            return Ok(responce);
         }
 
         [Authorize]
@@ -36,30 +39,31 @@ namespace NoticeBoardAPI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateAnnouncementRequest request)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            await _announcementService.CreateAsync(userId, request); 
-            return Ok();    
+            var responce = await _announcementService.CreateAsync(userId, request); 
+            return Ok(responce);    
         }
 
         [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateAnnouncementRequest request)
         {
-            var existing = await _announcementService.GetByIdAsync(id);
-            if (existing == null) 
+            var responce = await _announcementService.UpdateAsync(id, request);
+            if (responce == null) 
             { 
                 return NotFound(); 
             }
-            await _announcementService.UpdateAsync(id, request);
-            return Ok();
+            return Ok(responce);
         }
 
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var existing = await _announcementService.GetByIdAsync(id);
-            if (existing == null) { return NotFound(); };
-            await _announcementService.DeleteAsync(id);
+            var responce = await _announcementService.DeleteAsync(id);
+            if (!responce.Success)
+            {
+                return NotFound(responce);
+            }
             return NoContent();
         }
 

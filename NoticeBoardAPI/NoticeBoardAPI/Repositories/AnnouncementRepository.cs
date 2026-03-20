@@ -2,20 +2,21 @@
 using NoticeBoardAPI.Data;
 using NoticeBoardAPI.Models;
 using NoticeBoardAPI.DTOs;
+using NoticeBoardAPI.Interfaces;
 
 namespace NoticeBoardAPI.Repositories
 {
-    public class AnnouncementRepository
+    public class AnnouncementRepository: IAnnouncementRepository
     {
-        private readonly DbConnectionFactory dbConnectionFactory;
+        private readonly DbConnectionFactory _dbConnectionFactory;
         public AnnouncementRepository(DbConnectionFactory dbConnectionFactory)
         {
-            this.dbConnectionFactory = dbConnectionFactory;
+            _dbConnectionFactory = dbConnectionFactory;
         }
 
         public async Task<IEnumerable<AnnouncementDto>> GetAllAsync()
         {
-            using var connection = dbConnectionFactory.CreateConnection();
+            using var connection = _dbConnectionFactory.CreateConnection();
             return await connection.QueryAsync<AnnouncementDto>(
                 "sp_GetAnnouncements",
                 commandType: System.Data.CommandType.StoredProcedure
@@ -25,7 +26,7 @@ namespace NoticeBoardAPI.Repositories
 
         public async Task<AnnouncementDto?> GetByIdAsync (int id)
         {
-            using var connection = dbConnectionFactory.CreateConnection();
+            using var connection = _dbConnectionFactory.CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<AnnouncementDto>(
                 "sp_GetAnnouncementById",
                 new {Id = id},
@@ -35,7 +36,7 @@ namespace NoticeBoardAPI.Repositories
 
         public async Task CreateAsync(int userId, CreateAnnouncementRequest request)
         {
-            using var connection = dbConnectionFactory.CreateConnection();
+            using var connection = _dbConnectionFactory.CreateConnection();
             await connection.ExecuteAsync(
                 "sp_InsertAnnouncement",
                 new
@@ -45,7 +46,7 @@ namespace NoticeBoardAPI.Repositories
                     request.SubCategoryId,
                     request.Title,
                     request.DescriptionOfNote,
-                    request.StatusOfNote
+                    StatusOfNote = request.StatusOfNote.ToString().ToLower()
                 },
                 commandType: System.Data.CommandType.StoredProcedure
                 );
@@ -53,7 +54,7 @@ namespace NoticeBoardAPI.Repositories
 
         public async Task UpdateAsync(int id, CreateAnnouncementRequest request)
         {
-            using var connection = dbConnectionFactory.CreateConnection();
+            using var connection = _dbConnectionFactory.CreateConnection();
             await connection.ExecuteAsync(
                 "sp_UpdateAnnouncement",
                 new
@@ -63,7 +64,7 @@ namespace NoticeBoardAPI.Repositories
                     request.SubCategoryId,
                     request.Title,
                     request.DescriptionOfNote,
-                    request.StatusOfNote
+                    StatusOfNote = request.StatusOfNote.ToString().ToLower()
                 },
                 commandType: System.Data.CommandType.StoredProcedure
                 );
@@ -71,7 +72,7 @@ namespace NoticeBoardAPI.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            using var connection = dbConnectionFactory.CreateConnection();
+            using var connection = _dbConnectionFactory.CreateConnection();
             await connection.ExecuteAsync(
                 "sp_DeleteAnnouncement",
                 new { Id = id },
