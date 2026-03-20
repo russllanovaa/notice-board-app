@@ -45,7 +45,10 @@ namespace NoticeBoardAPI.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] CreateAnnouncementRequest request)
         {
             var existing = await _announcementService.GetByIdAsync(id);
-            if (existing == null) { return NotFound(); }
+            if (existing == null) 
+            { 
+                return NotFound(); 
+            }
             await _announcementService.UpdateAsync(id, request);
             return Ok();
         }
