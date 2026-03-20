@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NoticeBoardMVC.Interfaces;
 using NoticeBoardMVC.Services;
 using System.Text.Json;
 
@@ -6,10 +7,10 @@ namespace NoticeBoardMVC.Controllers
 {
     public class AuthController: Controller
     {
-        private readonly ApiService apiService;
+        private readonly IApiService apiService;
         private readonly IConfiguration configuration;
 
-        public AuthController(ApiService apiService, IConfiguration configuration)
+        public AuthController(IApiService apiService, IConfiguration configuration)
         {
             this.apiService = apiService;
             this.configuration = configuration;

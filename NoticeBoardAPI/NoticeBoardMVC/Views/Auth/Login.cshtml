@@ -1,0 +1,50 @@
+﻿@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Вхід";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4 text-center">
+        <h2 class="mb-4">Вхід в систему</h2>
+        <p class="text-muted mb-4">Для створення та керування оголошеннями увійдіть через Google акаунт</p>
+
+        <div id="g_id_onload"
+             data-client_id="@Configuration["GoogleAuth:ClientId"]"
+             data-callback="handleGoogleLogin"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="signin_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
+
+        <div id="loginError" class="alert alert-danger mt-3 d-none"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleGoogleLogin(response) {
+            fetch('/Auth/GoogleCallback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(response.credential)
+            })
+                .then(r => {
+                    if (r.ok) {
+                        window.location.href = '/';
+                    } else {
+                        document.getElementById('loginError').classList.remove('d-none');
+                        document.getElementById('loginError').textContent = 'Помилка входу. Спробуйте ще раз.';
+                    }
+                });
+        }
+    </script>
+}

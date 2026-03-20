@@ -2,10 +2,12 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using NoticeBoardMVC.Interfaces;
+using NoticeBoardMVC.Models;
 
 namespace NoticeBoardMVC.Services
 {
-    public class ApiService
+    public class ApiService: IApiService
     {
         private readonly HttpClient httpClient;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -26,16 +28,20 @@ namespace NoticeBoardMVC.Services
             }
         }
 
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+        };
+
         public async Task<T?> GetAsync<T>(string endpoint)
         {
             AttachToken();
             var responce = await httpClient.GetAsync(endpoint);
             if (!responce.IsSuccessStatusCode) return default;
             var content = await responce.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ApiResponseViewModel<T>>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            });
+            var result = JsonSerializer.Deserialize<ApiResponseViewModel<T>>(content, _jsonOptions);
             return result != null && result.Success ? result.Data : default;
         }
 

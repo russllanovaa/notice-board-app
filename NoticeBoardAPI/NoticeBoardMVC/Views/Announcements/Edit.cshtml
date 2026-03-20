@@ -1,6 +1,105 @@
-﻿namespace NoticeBoardMVC.Views.Shared
-{
-    public class Edit
-    {
-    }
+﻿@model NoticeBoardMVC.Models.CreateAnnouncementViewModel
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Редагувати оголошення";
+    var apiBaseUrl = Configuration["ApiSettings:BaseUrl"];
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">Редагувати оголошення</h2>
+
+        <form asp-action="Edit" method="post">
+            <div class="mb-3">
+                <label asp-for="CategoryId" class="form-label"></label>
+                <select name="CategoryId" class="form-select" id="categorySelect">
+                    <option value="">Оберіть категорію</option>
+                    @foreach (var item in Model.Categories)
+                    {
+                        if (item.Selected)
+                        {
+                            <option value="@item.Value" selected>@item.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SubCategoryId" class="form-label"></label>
+                <select name="SubCategoryId" class="form-select" id="subCategorySelect">
+                    <option value="">Оберіть підкатегорію</option>
+                    @foreach (var item in Model.SubCategories)
+                    {
+                        if (item.Selected)
+                        {
+                            <option value="@item.Value" selected>@item.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DescriptionOfNote" class="form-label"></label>
+                <textarea asp-for="DescriptionOfNote" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="DescriptionOfNote" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="StatusOfNote" class="form-label"></label>
+                <select asp-for="StatusOfNote"
+                        asp-items="Html.GetEnumSelectList<NoticeBoardMVC.Enums.AnnouncementStatus>()"
+                        class="form-select">
+                </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning">Зберегти</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            const categoryId = this.value;
+            const subSelect = document.getElementById('subCategorySelect');
+            subSelect.innerHTML = '<option value="">Оберіть підкатегорію</option>';
+
+            if (!categoryId) return;
+
+            const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+
+            fetch(`${apiBaseUrl}/api/Categories/${categoryId}/subcategories`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success && result.data) {
+                        result.data.forEach(sub => {
+                            const option = document.createElement('option');
+                            option.value = sub.id;
+                            option.textContent = sub.nameOfSubCategory;
+                            subSelect.appendChild(option);
+                        });
+                    }
+                });
+        });
+    </script>
 }

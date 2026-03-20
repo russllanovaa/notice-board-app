@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NoticeBoardMVC.Interfaces;
 using NoticeBoardMVC.Models;
 using NoticeBoardMVC.Services;
 using System.Diagnostics;
@@ -8,10 +9,10 @@ namespace NoticeBoardMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ApiService apiService;
+        private readonly IApiService apiService;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ApiService apiService, ILogger<HomeController> logger)
+        public HomeController(IApiService apiService, ILogger<HomeController> logger)
         {
             this.apiService = apiService;
             _logger = logger;
@@ -63,7 +64,7 @@ namespace NoticeBoardMVC.Controllers
                 SelectSubCategoryId = subCategoryId
             };
 
-            return View();
+            return View(model);
         }
 
         public IActionResult Privacy()

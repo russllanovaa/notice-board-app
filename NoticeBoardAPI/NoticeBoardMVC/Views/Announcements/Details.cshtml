@@ -1,6 +1,47 @@
-﻿namespace NoticeBoardMVC.Views.Shared
-{
-    public class Details
-    {
-    }
+﻿@model NoticeBoardMVC.Models.AnnouncementViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
 }
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div>
+                    <span class="badge bg-primary me-2">@Model.NameOfCategory</span>
+                    <span class="badge bg-secondary">@Model.NameOfSubCategory</span>
+                </div>
+                <span class="badge @(Model.StatusOfNote == "active" ? "bg-success" : "bg-danger")">
+                    @(Model.StatusOfNote == "active" ? "Активне" : "Неактивне")
+                </span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">@Model.Title</h3>
+                <p class="card-text">@Model.DescriptionOfNote</p>
+            </div>
+            <div class="card-footer text-muted">
+                <small>
+                    Автор: @Model.DisplayName (@Model.Email)
+                    | Створено: @Model.CreateDate.ToString("dd.MM.yyyy HH:mm")
+                    @if (Model.UpdatedDate.HasValue)
+                    {
+                        <span>| Оновлено: @Model.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                    }
+                </small>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Назад</a>
+            @if (Context.Session.GetString("JwtToken") != null)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+                      onsubmit="return confirm('Видалити оголошення?')">
+                    <button type="submit" class="btn btn-danger">Видалити</button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

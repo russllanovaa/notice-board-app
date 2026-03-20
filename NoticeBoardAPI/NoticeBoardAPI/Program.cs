@@ -17,6 +17,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(
             new System.Text.Json.Serialization.JsonStringEnumConverter()
             );
+        options.JsonSerializerOptions.NumberHandling =
+            System.Text.Json.Serialization.JsonNumberHandling.Strict;
     })
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -84,6 +86,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMVC", policy =>
+    {
+        policy.WithOrigins("http://localhost:5014")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
@@ -102,6 +114,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowMVC");
 app.UseAuthentication();
 app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseAuthorization();

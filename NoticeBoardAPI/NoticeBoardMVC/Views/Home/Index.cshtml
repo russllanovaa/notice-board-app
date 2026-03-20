@@ -1,8 +1,117 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model NoticeBoardMVC.Models.HomeViewModel
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Оголошення";
+    var apiBaseUrl = Configuration["ApiSettings:BaseUrl"];
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mb-4">
+    <div class="col">
+        <h2>Оголошення</h2>
+    </div>
 </div>
+
+<form method="get" asp-action="Index" asp-controller="Home" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <select name="categoryId" class="form-select" id="categorySelect"
+                asp-items="Model.Categories">
+            <option value="">Всі категорії</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select name="subCategoryId" class="form-select" id="subCategorySelect"
+                asp-items="Model.SubCategories">
+            <option value="">Всі підкатегорії</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Фільтрувати</button>
+    </div>
+    <div class="col-md-2">
+        <a asp-action="Index" class="btn btn-outline-secondary w-100">Скинути</a>
+    </div>
+</form>
+
+@if (!Model.Announcements.Any())
+{
+    <div class="alert alert-info">Оголошень не знайдено</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var announcement in Model.Announcements)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">@announcement.NameOfCategory</span>
+                            <span class="badge bg-secondary">@announcement.NameOfSubCategory</span>
+                        </div>
+                        <h5 class="card-title">@announcement.Title</h5>
+                        <p class="card-text text-muted">@announcement.DescriptionOfNote</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            @announcement.DisplayName — @announcement.CreateDate.ToString("dd.MM.yyyy")
+                        </small>
+                        <div class="mt-2 d-flex gap-2">
+                            <a asp-controller="Announcements"
+                               asp-action="Details"
+                               asp-route-id="@announcement.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                Детальніше
+                            </a>
+                            @if (Context.Session.GetString("JwtToken") != null)
+                            {
+                                <a asp-controller="Announcements"
+                                   asp-action="Edit"
+                                   asp-route-id="@announcement.Id"
+                                   class="btn btn-sm btn-outline-warning">
+                                    Редагувати
+                                </a>
+                                <form asp-controller="Announcements"
+                                      asp-action="Delete"
+                                      asp-route-id="@announcement.Id"
+                                      method="post"
+                                      onsubmit="return confirm('Видалити оголошення?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Видалити
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            const categoryId = this.value;
+            const subSelect = document.getElementById('subCategorySelect');
+            subSelect.innerHTML = '<option value="">Всі підкатегорії</option>';
+
+            if (!categoryId) return;
+
+            const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+
+            fetch(`${apiBaseUrl}/api/Categories/${categoryId}/subcategories`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success && result.data) {
+                        result.data.forEach(sub => {
+                            const option = document.createElement('option');
+                            option.value = sub.id;
+                            option.textContent = sub.nameOfSubCategory;
+                            subSelect.appendChild(option);
+                        });
+                    }
+                });
+        });
+    </script>
+}

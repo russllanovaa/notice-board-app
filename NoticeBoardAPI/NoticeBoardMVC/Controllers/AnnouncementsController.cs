@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NoticeBoardMVC.Interfaces;
 using NoticeBoardMVC.Models;
 using NoticeBoardMVC.Services;
 using System.Text.Json;
@@ -8,8 +9,8 @@ namespace NoticeBoardMVC.Controllers
 {
     public class AnnouncementsController: Controller
     {
-        private readonly ApiService apiService;
-        public AnnouncementsController(ApiService apiService)
+        private readonly IApiService apiService;
+        public AnnouncementsController(IApiService apiService)
         {
             this.apiService = apiService;
         }
@@ -23,18 +24,20 @@ namespace NoticeBoardMVC.Controllers
                 .Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
-                    Text = c.NameOfCategory
+                    Text = c.NameOfCategory,
+                    Selected = c.Id == model.CategoryId 
                 }).ToList();
 
-            if(model.Categories.Count > 0)
+            if (model.CategoryId > 0)
             {
                 var subCategories = await apiService.GetAsync<List<SubCategoryViewModel>>(
                     $"api/Categories/{model.CategoryId}/subcategories") ?? new();
                 model.SubCategories = subCategories
-                    .Select(c => new SelectListItem
+                    .Select(s => new SelectListItem
                     {
-                        Value = c.Id.ToString(),
-                        Text = c.NameOfSubCategory
+                        Value = s.Id.ToString(),
+                        Text = s.NameOfSubCategory,
+                        Selected = s.Id == model.SubCategoryId 
                     }).ToList();
             }
         }
@@ -63,7 +66,7 @@ namespace NoticeBoardMVC.Controllers
             var responce = await apiService.PostAsync("api/Announcements", new
             {
                 model.CategoryId,
-                SubCategoryId = model.CategoryId,
+                SubCategoryId = model.SubCategoryId,
                 model.Title,
                 model.DescriptionOfNote,
                 StatusOfNote = model.StatusOfNote
@@ -84,17 +87,19 @@ namespace NoticeBoardMVC.Controllers
         {
             if (!IsAuthenticated) return RedirectToAction("Login", "Auth");
 
-            var announcement = await apiService.GetAsync<AnnouncementViewModel>($"api/Announcement/{id}");
+            var announcement = await apiService.GetAsync<AnnouncementViewModel>($"api/Announcements/{id}");
             if (announcement == null) return NotFound();
 
             var model = new CreateAnnouncementViewModel
             {
+                CategoryId = announcement.CategoryId,
+                SubCategoryId = announcement.SubCategoryId,
                 Title = announcement.Title,
-                DescriptionOfNote = announcement.Description,
+                DescriptionOfNote = announcement.DescriptionOfNote,
                 StatusOfNote = Enum.Parse<NoticeBoardMVC.Enums.AnnouncementStatus>(announcement.StatusOfNote, true)
             };
 
-            await FillCategoriesAsync (model);
+            await FillCategoriesAsync(model);
             return View(model);
         }
 
@@ -112,10 +117,10 @@ namespace NoticeBoardMVC.Controllers
             var responce = await apiService.PutAsync($"api/Announcements/{id}", new
             {
                 model.CategoryId,
-                SubCategory = model.SubCategoryId,
+                SubCategoryId = model.SubCategoryId,
                 model.Title,
                 model.DescriptionOfNote,
-                StatusOfNome = model.StatusOfNote.ToString()
+                StatusOfNote = model.StatusOfNote.ToString()
             });
 
             if (responce.IsSuccessStatusCode)

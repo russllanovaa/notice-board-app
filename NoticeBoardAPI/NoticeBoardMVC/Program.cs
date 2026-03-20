@@ -1,3 +1,4 @@
+using NoticeBoardMVC.Interfaces;
 using NoticeBoardMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpClient<ApiService>(client =>
+builder.Services.AddHttpClient<IApiService, ApiService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
 });
