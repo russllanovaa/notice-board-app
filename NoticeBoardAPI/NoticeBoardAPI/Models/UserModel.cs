@@ -1,6 +1,6 @@
 ﻿namespace NoticeBoardAPI.Models
 {
-    public class User
+    public class UserModel
     {
         public int Id { get; set; }
         public string GoogleId {  get; set; } = string.Empty;

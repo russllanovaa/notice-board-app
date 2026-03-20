@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NoticeBoardAPI.Interfaces;
 using NoticeBoardAPI.DTOs;
 using NoticeBoardAPI.Services;
 using System.Security.Claims;
@@ -10,8 +11,8 @@ namespace NoticeBoardAPI.Controllers
     [Route("api/[controller]")]
     public class AnnouncementsController: ControllerBase
     {
-        private readonly AnnouncementService _announcementService;
-        public AnnouncementsController(AnnouncementService announcementService)
+        private readonly IAnnouncementService _announcementService;
+        public AnnouncementsController(IAnnouncementService announcementService)
         {
             _announcementService = announcementService;
         }

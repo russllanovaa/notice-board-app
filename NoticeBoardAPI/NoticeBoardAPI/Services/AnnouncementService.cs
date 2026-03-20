@@ -1,13 +1,14 @@
 ﻿using NoticeBoardAPI.Common;
 using NoticeBoardAPI.DTOs;
 using NoticeBoardAPI.Repositories;
+using NoticeBoardAPI.Interfaces;
 
 namespace NoticeBoardAPI.Services
 {
-    public class AnnouncementService
+    public class AnnouncementService: IAnnouncementService
     {
-        private readonly AnnouncementRepository _announcementRepository;
-        public AnnouncementService(AnnouncementRepository announcementRepository)
+        private readonly IAnnouncementRepository _announcementRepository;
+        public AnnouncementService(IAnnouncementRepository announcementRepository)
         {
             _announcementRepository = announcementRepository;
         }

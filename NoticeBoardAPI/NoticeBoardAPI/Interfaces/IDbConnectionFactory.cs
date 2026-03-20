@@ -1,6 +1,9 @@
-﻿namespace NoticeBoardAPI.Interfaces
+﻿using System.Data;
+
+namespace NoticeBoardAPI.Interfaces
 {
-    public class IDbConnectionFactory
+    public interface IDbConnectionFactory
     {
+        IDbConnection CreateConnection();
     }
 }

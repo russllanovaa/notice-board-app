@@ -1,9 +1,10 @@
 ﻿using Microsoft.Data.SqlClient;
+using NoticeBoardAPI.Interfaces;
 using System.Data;
 
 namespace NoticeBoardAPI.Data
 {
-    public class DbConnectionFactory
+    public class DbConnectionFactory: IDbConnectionFactory
     {
         private readonly string _connectionString;
 

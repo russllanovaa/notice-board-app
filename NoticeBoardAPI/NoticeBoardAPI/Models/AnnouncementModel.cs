@@ -2,7 +2,7 @@
 
 namespace NoticeBoardAPI.Models
 {
-    public class Announcement
+    public class AnnouncementModel
     {
         public int Id { get; set; }
         public int UserId { get; set; }

@@ -8,8 +8,8 @@ namespace NoticeBoardAPI.Repositories
 {
     public class AnnouncementRepository: IAnnouncementRepository
     {
-        private readonly DbConnectionFactory _dbConnectionFactory;
-        public AnnouncementRepository(DbConnectionFactory dbConnectionFactory)
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+        public AnnouncementRepository(IDbConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory;
         }

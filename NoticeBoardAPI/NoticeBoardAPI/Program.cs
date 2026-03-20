@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using NoticeBoardAPI.Interfaces;
 using NoticeBoardAPI.Data;
 using NoticeBoardAPI.Repositories;
 using NoticeBoardAPI.Services;
 using System.Text;
+using NoticeBoardAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,11 +63,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddSingleton<DbConnectionFactory>();
-builder.Services.AddScoped<AnnouncementRepository>();
-builder.Services.AddScoped<AnnouncementService>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
@@ -78,6 +82,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

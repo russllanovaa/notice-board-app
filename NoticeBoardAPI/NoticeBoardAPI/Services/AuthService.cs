@@ -1,14 +1,17 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using NoticeBoardAPI.Interfaces;
+using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace NoticeBoardAPI.Services
 {
-    public class TokenService
+    public class AuthService: IAuthService
     {
         private readonly IConfiguration _configuration;
-        public TokenService(IConfiguration configuration)
+        private readonly ConcurrentDictionary<string, DateTime> _blacklistedTokens = new();
+        public AuthService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -39,6 +42,16 @@ namespace NoticeBoardAPI.Services
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public void BlacklistToken(string token)
+        {
+            _blacklistedTokens.TryAdd(token, DateTime.UtcNow);
+        }
+
+        public bool IsTokenBlacklisted(string token)
+        {
+            return _blacklistedTokens.ContainsKey(token);
         }
     }
 }

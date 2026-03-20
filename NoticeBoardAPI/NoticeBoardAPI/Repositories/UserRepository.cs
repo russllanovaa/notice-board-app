@@ -1,28 +1,39 @@
 ﻿using Dapper;
 using NoticeBoardAPI.Data;
 using NoticeBoardAPI.Models;
+using NoticeBoardAPI.Interfaces;
+using System.Net.WebSockets;
 
 namespace NoticeBoardAPI.Repositories
 {
-    public class UserRepository
+    public class UserRepository: IUserRepository
     {
-        private readonly DbConnectionFactory _connectionFactory;
-        public UserRepository(DbConnectionFactory connectionFactory)
+        private readonly IDbConnectionFactory _connectionFactory;
+        public UserRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }   
 
-        public async Task<User?> GetByGoogleIdAsync(string googleId)
+        public async Task<UserModel?> GetByGoogleIdAsync(string googleId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<User>(
+            return await connection.QueryFirstOrDefaultAsync<UserModel>(
                 "SELECT * FROM Users WHERE GoogleId = @GoogleId",
                 new { GoogleId = googleId }
             );
 
         }
 
-        public async Task<User> CreateAsync(User user)
+        public async Task<UserModel?> GetByIdAsync(int id)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<UserModel>(
+                "SELECT * FROM Users WHERE Id = @Id",
+                new { Id = id }
+            );
+        }
+
+        public async Task<UserModel> CreateAsync(UserModel user)
         {
             using var connection = _connectionFactory.CreateConnection();
             var id = await connection.QuerySingleAsync<int>(
