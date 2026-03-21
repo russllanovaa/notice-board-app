@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using NoticeBoardMVC.Interfaces;
 using NoticeBoardMVC.Models;
+using System.Net.Http;
 
 namespace NoticeBoardMVC.Services
 {
@@ -43,6 +44,15 @@ namespace NoticeBoardMVC.Services
             var content = await responce.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<ApiResponseViewModel<T>>(content, _jsonOptions);
             return result != null && result.Success ? result.Data : default;
+        }
+
+        public async Task<PagedResponseViewModel<T>?> GetPagedAsync<T>(string endpoint)
+        {
+            AttachToken();
+            var response = await httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode) return default;
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<PagedResponseViewModel<T>>(content, _jsonOptions);
         }
 
         public async Task<HttpResponseMessage> PostAsync<T>(string endpoint, T data)

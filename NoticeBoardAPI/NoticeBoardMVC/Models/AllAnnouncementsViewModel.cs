@@ -9,5 +9,8 @@ namespace NoticeBoardMVC.Models
         public List<SelectListItem> SubCategories { get; set; } = new();
         public int? SelectedCategoryId { get; set; }
         public int? SelectedSubCategoryId { get; set; }
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
     }
 }

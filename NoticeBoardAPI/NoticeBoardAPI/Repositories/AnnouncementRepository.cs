@@ -24,6 +24,25 @@ namespace NoticeBoardAPI.Repositories
 
         }
 
+        public async Task<IEnumerable<AnnouncementDto>> GetAllAsync(int page, int pageSize)
+        {
+            using var connection = _dbConnectionFactory.CreateConnection();
+            return await connection.QueryAsync<AnnouncementDto>(
+                "sp_GetAnnouncements",
+                new { Page = page, PageSize = pageSize },
+                commandType: System.Data.CommandType.StoredProcedure
+            );
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            using var connection = _dbConnectionFactory.CreateConnection();
+            return await connection.QuerySingleAsync<int>(
+                "sp_GetAnnouncementsCount",
+                commandType: System.Data.CommandType.StoredProcedure
+            );
+        }
+
         public async Task<AnnouncementDto?> GetByIdAsync (int id)
         {
             using var connection = _dbConnectionFactory.CreateConnection();
@@ -34,11 +53,21 @@ namespace NoticeBoardAPI.Repositories
                 );
         }
 
-        public async Task<IEnumerable<AnnouncementDto>> GetByUserIdAsync(int userId)
+        public async Task<IEnumerable<AnnouncementDto>> GetByUserIdAsync(int userId, int page, int pageSize)
         {
             using var connection = _dbConnectionFactory.CreateConnection();
             return await connection.QueryAsync<AnnouncementDto>(
                 "sp_GetAnnouncementsByUserId",
+                new { UserId = userId, Page = page, PageSize = pageSize },
+                commandType: System.Data.CommandType.StoredProcedure
+            );
+        }
+
+        public async Task<int> GetCountByUserIdAsync(int userId)
+        {
+            using var connection = _dbConnectionFactory.CreateConnection();
+            return await connection.QuerySingleAsync<int>(
+                "sp_GetAnnouncementsCountByUserId",
                 new { UserId = userId },
                 commandType: System.Data.CommandType.StoredProcedure
             );

@@ -17,11 +17,24 @@ namespace NoticeBoardAPI.Controllers
             _announcementService = announcementService;
         }
 
+        
+
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 6)
         {
-            var responce = await _announcementService.GetAllAsync();
-            return Ok(responce);
+            var response = await _announcementService.GetAllAsync(page, pageSize);
+            var countResponse = await _announcementService.GetTotalCountAsync();
+
+            return Ok(new
+            {
+                data = response.Data,
+                success = true,
+                message = "",
+                page = page,
+                pageSize = pageSize,
+                totalCount = countResponse.Data,
+                totalPages = (int)Math.Ceiling((double)countResponse.Data / pageSize)
+            });
         }
 
         [HttpGet("{id}")]
@@ -37,11 +50,22 @@ namespace NoticeBoardAPI.Controllers
 
         [Authorize]
         [HttpGet("my")]
-        public async Task<IActionResult> GetMy()
+        public async Task<IActionResult> GetMy([FromQuery] int page = 1, [FromQuery] int pageSize = 6)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var responce = await _announcementService.GetByUserIdAsync(userId);
-            return Ok(responce);
+            var response = await _announcementService.GetByUserIdAsync(userId, page, pageSize);
+            var countResponse = await _announcementService.GetCountByUserIdAsync(userId);
+
+            return Ok(new
+            {
+                data = response.Data,
+                success = true,
+                message = "",
+                page = page,
+                pageSize = pageSize,
+                totalCount = countResponse.Data,
+                totalPages = (int)Math.Ceiling((double)countResponse.Data / pageSize)
+            });
         }
 
         [Authorize]

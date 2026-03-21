@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NoticeBoardMVC.Interfaces;
+using NoticeBoardMVC.Enums;
 using NoticeBoardMVC.Models;
 using NoticeBoardMVC.Services;
 using System.Text.Json;
@@ -43,15 +44,25 @@ namespace NoticeBoardMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MyAnnouncements()
+        public async Task<IActionResult> MyAnnouncements(int page = 1)
         {
             if (!IsAuthenticated) return RedirectToAction("Login", "Auth");
 
-            var announcements = await apiService.GetAsync<List<AnnouncementViewModel>>("api/Announcements/my") ?? new();
+            const int pageSize = 6;
+
+            var pagedResult = await apiService.GetPagedAsync<List<AnnouncementViewModel>>(
+                $"api/Announcements/my?page={page}&pageSize={pageSize}") ?? new();
+
+            var announcements = pagedResult.Data ?? new();
 
             var model = new MyAnnouncementsViewModel
             {
-                Announcements = announcements
+                Announcements = announcements,
+                Total = pagedResult.TotalCount,
+                Active = announcements.Count(a => a.StatusOfNote == AnnouncementStatus.Active),
+                Inactive = announcements.Count(a => a.StatusOfNote == AnnouncementStatus.Inactive),
+                CurrentPage = page,
+                TotalPages = pagedResult.TotalPages
             };
 
             return View(model);
@@ -98,9 +109,14 @@ namespace NoticeBoardMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> All(int? categoryId, int? subCategoryId)
+        public async Task<IActionResult> All(int? categoryId, int? subCategoryId, int page = 1)
         {
-            var announcements = await apiService.GetAsync<List<AnnouncementViewModel>>("api/Announcements") ?? new();
+            const int pageSize = 6;
+
+            var pagedResult = await apiService.GetPagedAsync<List<AnnouncementViewModel>>(
+                $"api/Announcements?page={page}&pageSize={pageSize}") ?? new();
+
+            var announcements = pagedResult.Data ?? new();
             var categories = await apiService.GetAsync<List<CategoryViewModel>>("api/Categories") ?? new();
 
             if (categoryId.HasValue)
@@ -136,7 +152,10 @@ namespace NoticeBoardMVC.Controllers
                 Announcements = announcements,
                 Categories = categoryItems,
                 SelectedCategoryId = categoryId,
-                SelectedSubCategoryId = subCategoryId
+                SelectedSubCategoryId = subCategoryId,
+                CurrentPage = page,
+                TotalPages = pagedResult.TotalPages,
+                TotalCount = pagedResult.TotalCount
             };
 
             return View(model);

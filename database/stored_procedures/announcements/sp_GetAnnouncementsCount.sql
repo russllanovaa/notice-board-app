@@ -1,0 +1,6 @@
+CREATE OR ALTER PROCEDURE sp_GetAnnouncementsCount
+AS
+BEGIN
+    SELECT COUNT(*) FROM Announcements
+END
+GO

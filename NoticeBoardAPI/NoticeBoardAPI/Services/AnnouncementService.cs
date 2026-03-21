@@ -19,6 +19,18 @@ namespace NoticeBoardAPI.Services
             return ServiceResponse<IEnumerable<AnnouncementDto>>.Ok(announcements); 
         }
 
+        public async Task<ServiceResponse<IEnumerable<AnnouncementDto>>> GetAllAsync(int page, int pageSize)
+        {
+            var announcements = await _announcementRepository.GetAllAsync(page, pageSize);
+            return ServiceResponse<IEnumerable<AnnouncementDto>>.Ok(announcements);
+        }
+
+        public async Task<ServiceResponse<int>> GetTotalCountAsync()
+        {
+            var count = await _announcementRepository.GetTotalCountAsync();
+            return ServiceResponse<int>.Ok(count);
+        }
+
         public async Task<ServiceResponse<AnnouncementDto>> GetByIdAsync(int id)
         {
             var announcement = await _announcementRepository.GetByIdAsync(id);
@@ -29,10 +41,16 @@ namespace NoticeBoardAPI.Services
             return ServiceResponse<AnnouncementDto>.Ok(announcement);
         }
 
-        public async Task<ServiceResponse<IEnumerable<AnnouncementDto>>> GetByUserIdAsync(int userId)
+        public async Task<ServiceResponse<IEnumerable<AnnouncementDto>>> GetByUserIdAsync(int userId, int page, int pageSize)
         {
-            var announcement = await _announcementRepository.GetByUserIdAsync(userId);
-            return ServiceResponse<IEnumerable<AnnouncementDto>>.Ok(announcement);
+            var announcements = await _announcementRepository.GetByUserIdAsync(userId, page, pageSize);
+            return ServiceResponse<IEnumerable<AnnouncementDto>>.Ok(announcements);
+        }
+
+        public async Task<ServiceResponse<int>> GetCountByUserIdAsync(int userId)
+        {
+            var count = await _announcementRepository.GetCountByUserIdAsync(userId);
+            return ServiceResponse<int>.Ok(count);
         }
 
         public async Task<ServiceResponse<bool>> CreateAsync(int userId, CreateAnnouncementRequest request)

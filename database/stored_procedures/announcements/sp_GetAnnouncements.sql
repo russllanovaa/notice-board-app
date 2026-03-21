@@ -1,8 +1,12 @@
 CREATE OR ALTER PROCEDURE sp_GetAnnouncements
+    @Page INT = 1,
+    @PageSize INT = 6
 AS
 BEGIN
     SELECT
         a.Id,
+        a.CategoryId,
+        a.SubCategoryId,
         a.Title,
         a.DescriptionOfNote,
         a.CreateDate,
@@ -16,5 +20,8 @@ BEGIN
     INNER JOIN Categories c ON a.CategoryId = c.Id
     INNER JOIN SubCategories s ON a.SubCategoryId = s.Id
     INNER JOIN Users u ON a.UserId = u.Id
+    ORDER BY a.CreateDate DESC
+    OFFSET (@Page - 1) * @PageSize ROWS
+    FETCH NEXT @PageSize ROWS ONLY
 END
 GO
