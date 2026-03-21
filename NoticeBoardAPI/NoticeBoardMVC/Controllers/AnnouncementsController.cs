@@ -43,6 +43,21 @@ namespace NoticeBoardMVC.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> MyAnnouncements()
+        {
+            if (!IsAuthenticated) return RedirectToAction("Login", "Auth");
+
+            var announcements = await apiService.GetAsync<List<AnnouncementViewModel>>("api/Announcements/my") ?? new();
+
+            var model = new MyAnnouncementsViewModel
+            {
+                Announcements = announcements
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             if (!IsAuthenticated) return RedirectToAction("Login", "Auth");
@@ -74,11 +89,56 @@ namespace NoticeBoardMVC.Controllers
 
             if (responce.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("All", "Announcements");
             }
 
             ModelState.AddModelError("", "Помилка при створенні оголошення");
             await FillCategoriesAsync(model);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> All(int? categoryId, int? subCategoryId)
+        {
+            var announcements = await apiService.GetAsync<List<AnnouncementViewModel>>("api/Announcements") ?? new();
+            var categories = await apiService.GetAsync<List<CategoryViewModel>>("api/Categories") ?? new();
+
+            if (categoryId.HasValue)
+            {
+                announcements = announcements
+                    .Where(a => a.NameOfCategory == categories
+                        .FirstOrDefault(c => c.Id == categoryId)?.NameOfCategory)
+                    .ToList();
+            }
+
+            if (subCategoryId.HasValue)
+            {
+                var subCategories = await apiService.GetAsync<List<SubCategoryViewModel>>(
+                    $"api/Categories/{categoryId}/subcategories") ?? new();
+                announcements = announcements
+                    .Where(a => a.NameOfSubCategory == subCategories
+                        .FirstOrDefault(s => s.Id == subCategoryId)?.NameOfSubCategory)
+                    .ToList();
+            }
+
+            var categoryItems = categories
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.NameOfCategory,
+                    Selected = c.Id == categoryId
+                }).ToList();
+
+            categoryItems.Insert(0, new SelectListItem { Value = "", Text = "Всі категорії" });
+
+            var model = new AllAnnouncementsViewModel
+            {
+                Announcements = announcements,
+                Categories = categoryItems,
+                SelectedCategoryId = categoryId,
+                SelectedSubCategoryId = subCategoryId
+            };
+
             return View(model);
         }
 
@@ -96,7 +156,7 @@ namespace NoticeBoardMVC.Controllers
                 SubCategoryId = announcement.SubCategoryId,
                 Title = announcement.Title,
                 DescriptionOfNote = announcement.DescriptionOfNote,
-                StatusOfNote = Enum.Parse<NoticeBoardMVC.Enums.AnnouncementStatus>(announcement.StatusOfNote, true)
+                StatusOfNote = announcement.StatusOfNote
             };
 
             await FillCategoriesAsync(model);
@@ -125,7 +185,7 @@ namespace NoticeBoardMVC.Controllers
 
             if (responce.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("All", "Announcements");
             }
 
             ModelState.AddModelError("", "Помилка при оновленні оголошення");
@@ -147,7 +207,7 @@ namespace NoticeBoardMVC.Controllers
             if (!IsAuthenticated) return RedirectToAction("Login", "Auth");
 
             await apiService.DeleteAsync($"api/Announcements/{id}");
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("All", "Announcements");
         }
     }
 }

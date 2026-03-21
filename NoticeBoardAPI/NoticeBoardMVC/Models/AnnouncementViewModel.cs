@@ -1,4 +1,6 @@
-﻿namespace NoticeBoardMVC.Models
+﻿using NoticeBoardMVC.Enums;
+
+namespace NoticeBoardMVC.Models
 {
     public class AnnouncementViewModel
     {
@@ -10,7 +12,7 @@
         public string? DescriptionOfNote { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public string StatusOfNote { get; set; } = string.Empty;
+        public AnnouncementStatus StatusOfNote { get; set; }
         public string NameOfCategory { get; set; } = string.Empty;
         public string NameOfSubCategory { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;

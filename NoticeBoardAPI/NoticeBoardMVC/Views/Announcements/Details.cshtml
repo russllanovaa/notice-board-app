@@ -4,44 +4,82 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <div>
-                    <span class="badge bg-primary me-2">@Model.NameOfCategory</span>
-                    <span class="badge bg-secondary">@Model.NameOfSubCategory</span>
-                </div>
-                <span class="badge @(Model.StatusOfNote == "active" ? "bg-success" : "bg-danger")">
-                    @(Model.StatusOfNote == "active" ? "Активне" : "Неактивне")
-                </span>
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">@Model.Title</h3>
-                <p class="card-text">@Model.DescriptionOfNote</p>
-            </div>
-            <div class="card-footer text-muted">
-                <small>
-                    Автор: @Model.DisplayName (@Model.Email)
-                    | Створено: @Model.CreateDate.ToString("dd.MM.yyyy HH:mm")
-                    @if (Model.UpdatedDate.HasValue)
-                    {
-                        <span>| Оновлено: @Model.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
-                    }
-                </small>
-            </div>
-        </div>
+<div style="position:relative;max-width:720px;margin:0 auto;padding-top:20px;">
 
-        <div class="mt-3 d-flex gap-2">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Назад</a>
-            @if (Context.Session.GetString("JwtToken") != null)
-            {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
-                <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
-                      onsubmit="return confirm('Видалити оголошення?')">
-                    <button type="submit" class="btn btn-danger">Видалити</button>
-                </form>
-            }
+    <svg style="position:absolute;top:-10px;right:-60px;width:100px;height:100px;opacity:0.12;pointer-events:none;" viewBox="0 0 200 200" fill="none">
+        <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+    </svg>
+   
+    <svg style="position:absolute;bottom:60px;left:-40px;width:60px;height:60px;opacity:0.07;pointer-events:none;" viewBox="0 0 200 200" fill="none">
+        <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+    </svg>
+
+    <p style="font-size:11px;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;">
+        <a asp-controller="Announcements" asp-action="All" style="color:#999;text-decoration:none;">Всі оголошення</a>
+        <span style="margin:0 8px;">→</span>
+        Деталі
+    </p>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <span class="badge badge-gray">@Model.NameOfCategory</span>
+        <span style="color:#ddd;font-size:12px;">·</span>
+        <span class="badge badge-gray">@Model.NameOfSubCategory</span>
+        <span style="color:#ddd;font-size:12px;">·</span>
+        @if (Model.StatusOfNote == NoticeBoardMVC.Enums.AnnouncementStatus.Active)
+        {
+            <span class="badge badge-green">Активне</span>
+        }
+        else
+        {
+            <span class="badge badge-red">Неактивне</span>
+        }
+    </div>
+
+    <h1 style="font-size:32px;font-weight:600;line-height:1.2;margin-bottom:16px;letter-spacing:-0.5px;">@Model.Title</h1>
+
+    <div style="border-top:0.5px solid #e5e5e5;border-bottom:0.5px solid #e5e5e5;padding:24px 0;margin-bottom:24px;">
+        <p style="font-size:15px;color:#444;line-height:1.8;">@Model.DescriptionOfNote</p>
+    </div>
+
+    <div style="display:flex;gap:24px;margin-bottom:40px;flex-wrap:wrap;">
+        <div>
+            <p style="font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Автор</p>
+            <p style="font-size:14px;font-weight:500;">@Model.DisplayName</p>
+            <p style="font-size:12px;color:#aaa;">@Model.Email</p>
         </div>
+        <div>
+            <p style="font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Створено</p>
+            <p style="font-size:14px;font-weight:500;">@Model.CreateDate.ToString("dd.MM.yyyy")</p>
+            <p style="font-size:12px;color:#aaa;">@Model.CreateDate.ToString("HH:mm")</p>
+        </div>
+        @if (Model.UpdatedDate.HasValue)
+        {
+            <div>
+                <p style="font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Оновлено</p>
+                <p style="font-size:14px;font-weight:500;">@Model.UpdatedDate.Value.ToString("dd.MM.yyyy")</p>
+                <p style="font-size:12px;color:#aaa;">@Model.UpdatedDate.Value.ToString("HH:mm")</p>
+            </div>
+        }
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;padding-top:24px;border-top:0.5px solid #e5e5e5;">
+        <a asp-controller="Announcements" asp-action="All"
+           style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:0.5px solid #ddd;border-radius:8px;font-size:13px;text-decoration:none;color:#555;">
+            ← Назад
+        </a>
+        @if (Context.Session.GetString("JwtToken") != null)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id"
+               class="btn-hero-dark" style="padding:10px 20px;font-size:13px;">
+                Редагувати
+            </a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+                  onsubmit="return confirm('Видалити оголошення?')" style="margin:0;">
+                <button type="submit"
+                        style="display:inline-flex;align-items:center;padding:10px 20px;border:0.5px solid #fcc;border-radius:8px;background:transparent;color:#A32D2D;font-size:13px;cursor:pointer;">
+                    Видалити
+                </button>
+            </form>
+        }
     </div>
 </div>

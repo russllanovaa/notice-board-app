@@ -7,6 +7,7 @@ namespace NoticeBoardAPI.Interfaces
     {
         Task<IEnumerable<AnnouncementDto>> GetAllAsync();
         Task<AnnouncementDto?> GetByIdAsync(int id);
+        Task<IEnumerable<AnnouncementDto>> GetByUserIdAsync(int userId);
         Task CreateAsync(int userId, CreateAnnouncementRequest request);
         Task UpdateAsync(int id, CreateAnnouncementRequest request);
         Task DeleteAsync(int id);

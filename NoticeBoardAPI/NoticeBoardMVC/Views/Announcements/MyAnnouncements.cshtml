@@ -1,0 +1,62 @@
+﻿@model NoticeBoardMVC.Models.MyAnnouncementsViewModel
+
+@{
+    ViewData["Title"] = "Мої оголошення";
+}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Мої оголошення</h2>
+        <p class="page-subtitle">@Context.Session.GetString("UserName")</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">+ Нове оголошення</a>
+</div>
+
+<div class="grid-3 mb-4">
+    <div class="stat-card">
+        <p class="stat-label">Всього оголошень</p>
+        <p class="stat-value">@Model.Total</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Активних</p>
+        <p class="stat-value" style="color:#0F6E56;">@Model.Active</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Неактивних</p>
+        <p class="stat-value" style="color:#A32D2D;">@Model.InActive</p>
+    </div>
+</div>
+
+@if (!Model.Announcements.Any())
+{
+        <p style="color:#888;font-size:14px;">У вас ще немає оголошень</p>
+}
+else
+{
+    @foreach (var a in Model.Announcements)
+    {
+                <div class="announcement-row">
+                    <div>
+                        <div class="d-flex gap-2 align-center mb-1">
+                            <span class="badge badge-gray">@a.NameOfSubCategory</span>
+                    @if (a.StatusOfNote == NoticeBoardMVC.Enums.AnnouncementStatus.Active)
+                    {
+                                    <span class="badge badge-green">Активне</span>
+                    }
+                    else
+                    {
+                                    <span class="badge badge-red">Неактивне</span>
+                    }
+                        </div>
+                        <p style="font-size:15px;font-weight:500;">@a.Title</p>
+                        <p style="font-size:12px;color:#aaa;margin-top:2px;">@a.CreateDate.ToString("dd.MM.yyyy")</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-outline btn-sm">Редагувати</a>
+                        <form asp-action="Delete" asp-route-id="@a.Id" method="post" onsubmit="return confirm('Видалити?')">
+                            <button type="submit" class="btn btn-sm" style="color:#A32D2D;border-color:#fcc;">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+    }
+}

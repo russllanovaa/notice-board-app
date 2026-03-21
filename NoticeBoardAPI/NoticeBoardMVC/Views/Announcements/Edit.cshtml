@@ -3,17 +3,18 @@
 
 @{
     ViewData["Title"] = "Редагувати оголошення";
-    var apiBaseUrl = Configuration["ApiSettings:BaseUrl"];
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <h2 class="mb-4">Редагувати оголошення</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 56px);margin:-40px -32px;gap:0;">
+
+    <div style="padding:32px 48px;display:flex;flex-direction:column;justify-content:center;">
+        <p style="font-size:11px;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Дошка оголошень</p>
+        <h1 style="font-size:22px;font-weight:600;margin-bottom:20px;">Редагувати оголошення</h1>
 
         <form asp-action="Edit" method="post">
-            <div class="mb-3">
-                <label asp-for="CategoryId" class="form-label"></label>
-                <select name="CategoryId" class="form-select" id="categorySelect">
+            <div class="form-group">
+                <label class="form-label">Категорія</label>
+                <select name="CategoryId" class="form-control" id="categorySelect">
                     <option value="">Оберіть категорію</option>
                     @foreach (var item in Model.Categories)
                     {
@@ -30,9 +31,9 @@
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="SubCategoryId" class="form-label"></label>
-                <select name="SubCategoryId" class="form-select" id="subCategorySelect">
+            <div class="form-group">
+                <label class="form-label">Підкатегорія</label>
+                <select name="SubCategoryId" class="form-control" id="subCategorySelect">
                     <option value="">Оберіть підкатегорію</option>
                     @foreach (var item in Model.SubCategories)
                     {
@@ -49,57 +50,90 @@
                 <span asp-validation-for="SubCategoryId" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label"></label>
-                <input asp-for="Title" class="form-control" />
+            <div class="form-group">
+                <label class="form-label">Заголовок</label>
+                <input asp-for="Title" class="form-control" placeholder="Наприклад: Samsung Side-by-Side" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="DescriptionOfNote" class="form-label"></label>
-                <textarea asp-for="DescriptionOfNote" class="form-control" rows="4"></textarea>
+            <div class="form-group">
+                <label class="form-label">Опис</label>
+                <textarea asp-for="DescriptionOfNote" class="form-control" rows="4" placeholder="Детальний опис оголошення..."></textarea>
                 <span asp-validation-for="DescriptionOfNote" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="StatusOfNote" class="form-label"></label>
+            <div class="form-group">
+                <label class="form-label">Статус</label>
                 <select asp-for="StatusOfNote"
                         asp-items="Html.GetEnumSelectList<NoticeBoardMVC.Enums.AnnouncementStatus>()"
-                        class="form-select">
+                        class="form-control">
                 </select>
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-warning">Зберегти</button>
-                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+            <div style="display:flex;gap:10px;margin-top:8px;">
+                <button type="submit" class="btn-hero-dark" style="padding:12px 28px;">Зберегти</button>
+                <a asp-controller="Announcements" asp-action="All" style="display:inline-flex;align-items:center;padding:12px 20px;border:0.5px solid #ddd;border-radius:8px;font-size:14px;text-decoration:none;color:#555;">Скасувати</a>
             </div>
         </form>
+    </div>
+
+    <div style="border-left:0.5px solid #e5e5e5;display:flex;justify-content:center;align-items:center;position:relative;overflow:hidden;">
+        <img src="~/images/form-cat.png"
+             alt=""
+             style="width:60%;max-width:300px;position:relative;z-index:1;" />
+
+        <svg style="position:absolute;top:10%;right:10%;width:120px;height:120px;" viewBox="0 0 200 200" fill="none">
+            <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+        </svg>
+
+        <svg style="position:absolute;bottom:15%;right:20%;width:60px;height:60px;" viewBox="0 0 200 200" fill="none">
+            <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#aaa" />
+        </svg>
+
+        <svg style="position:absolute;top:15%;left:15%;width:200px;height:200px;opacity:0.3;" viewBox="0 0 200 200" fill="none">
+            @for (int i = 0; i < 24; i++)
+            {
+                var angle = i * 15;
+                var rad = angle * Math.PI / 180;
+                var x1 = 100 + 60 * Math.Cos(rad);
+                var y1 = 100 + 60 * Math.Sin(rad);
+                var x2 = 100 + 95 * Math.Cos(rad);
+                var y2 = 100 + 95 * Math.Sin(rad);
+                <line x1="@x1.ToString("F1")" y1="@y1.ToString("F1")" x2="@x2.ToString("F1")" y2="@y2.ToString("F1")" stroke="#999" stroke-width="0.8" />
+            }
+        </svg>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        document.getElementById('categorySelect').addEventListener('change', function () {
-            const categoryId = this.value;
+        const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+
+        function loadSubCategories(categoryId, selectedSubId) {
             const subSelect = document.getElementById('subCategorySelect');
             subSelect.innerHTML = '<option value="">Оберіть підкатегорію</option>';
-
             if (!categoryId) return;
-
-            const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
-
             fetch(`${apiBaseUrl}/api/Categories/${categoryId}/subcategories`)
                 .then(r => r.json())
                 .then(result => {
                     if (result.success && result.data) {
                         result.data.forEach(sub => {
-                            const option = document.createElement('option');
-                            option.value = sub.id;
-                            option.textContent = sub.nameOfSubCategory;
-                            subSelect.appendChild(option);
+                            const o = document.createElement('option');
+                            o.value = sub.id;
+                            o.textContent = sub.nameOfSubCategory;
+                            if (selectedSubId && sub.id == selectedSubId) o.selected = true;
+                            subSelect.appendChild(o);
                         });
                     }
                 });
+        }
+
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            loadSubCategories(this.value, null);
         });
+
+        const initialCategory = document.getElementById('categorySelect').value;
+        const initialSub = '@Model.SubCategoryId';
+        if (initialCategory) loadSubCategories(initialCategory, initialSub);
     </script>
 }

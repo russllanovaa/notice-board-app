@@ -1,0 +1,165 @@
+﻿@model NoticeBoardMVC.Models.AllAnnouncementsViewModel
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Всі оголошення";
+}
+
+<div style="position:relative;min-height:100%;">
+
+    <svg style="position:absolute;top:-20px;right:40px;width:80px;height:80px;opacity:0.15;pointer-events:none;" viewBox="0 0 200 200" fill="none">
+        <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+    </svg>
+    <svg style="position:absolute;top:60px;right:20px;width:40px;height:40px;opacity:0.1;pointer-events:none;" viewBox="0 0 200 200" fill="none">
+        <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+    </svg>
+    <svg style="position:absolute;bottom:40px;left:20px;width:50px;height:50px;opacity:0.08;pointer-events:none;" viewBox="0 0 200 200" fill="none">
+        <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+    </svg>
+
+    <div class="page-header">
+        <div>
+            <p style="font-size:11px;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Дошка оголошень</p>
+            <h2 class="page-title">Всі оголошення</h2>
+        </div>
+    </div>
+
+    <div class="filters" style="margin-bottom:28px;">
+        <form method="get" asp-action="All" asp-controller="Announcements" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select name="categoryId" class="form-control" id="categorySelect" style="width:auto;">
+                @foreach (var category in Model.Categories)
+                {
+                    if (category.Selected)
+                    {
+                        <option value="@category.Value" selected>@category.Text</option>
+                    }
+                    else
+                    {
+                        <option value="@category.Value">@category.Text</option>
+                    }
+                }
+            </select>
+            <select name="subCategoryId" class="form-control" id="subCategorySelect" style="width:auto;">
+                <option value="">Всі підкатегорії</option>
+                @foreach (var sub in Model.SubCategories)
+                {
+                    if (sub.Selected)
+                    {
+                        <option value="@sub.Value" selected>@sub.Text</option>
+                    }
+                    else
+                    {
+                        <option value="@sub.Value">@sub.Text</option>
+                    }
+                }
+            </select>
+            <button type="submit" class="btn btn-outline">Фільтрувати</button>
+            <a asp-action="All" class="btn btn-ghost">Скинути</a>
+        </form>
+    </div>
+
+    @if (!Model.Announcements.Any())
+    {
+        <div style="text-align:center;padding:60px 0;">
+            <svg style="width:48px;height:48px;opacity:0.2;margin-bottom:16px;" viewBox="0 0 200 200" fill="none">
+                <path d="M100 5 C100 5 110 90 195 100 C110 110 100 195 100 195 C100 195 90 110 5 100 C90 90 100 5 100 5Z" fill="#111" />
+            </svg>
+            <p style="color:#aaa;font-size:14px;">Оголошень не знайдено</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid-3">
+            @foreach (var a in Model.Announcements)
+            {
+                <div class="card" style="transition:transform 0.15s,border-color 0.15s;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='#bbb'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='#e5e5e5'">
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+                        <span class="badge badge-gray">@a.NameOfSubCategory</span>
+                        @if (a.StatusOfNote == NoticeBoardMVC.Enums.AnnouncementStatus.Active)
+                        {
+                            <span class="badge badge-green">Активне</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-red">Неактивне</span>
+                        }
+                    </div>
+
+                    <p style="font-size:16px;font-weight:600;margin-bottom:6px;line-height:1.3;">@a.Title</p>
+                    <p style="font-size:13px;color:#888;line-height:1.5;margin-bottom:12px;min-height:40px;">@a.DescriptionOfNote</p>
+
+                    <div style="border-top:0.5px solid #f0f0f0;padding-top:12px;margin-top:auto;">
+                        <p style="font-size:12px;color:#aaa;margin-bottom:12px;">@a.DisplayName · @a.CreateDate.ToString("dd.MM.yyyy")</p>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <a asp-controller="Announcements" asp-action="Details" asp-route-id="@a.Id"
+                               class="btn btn-outline btn-sm" style="flex:1;justify-content:center;">
+                                Детальніше
+                            </a>
+                            @if (Context.Session.GetString("JwtToken") != null)
+                            {
+                                <a asp-controller="Announcements" asp-action="Edit" asp-route-id="@a.Id"
+                                   style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0.5px solid #ddd;border-radius:8px;text-decoration:none;color:#555;font-size:14px;transition:background 0.15s;"
+                                   onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'"
+                                   title="Редагувати">
+                                    ✏
+                                </a>
+                                <form asp-controller="Announcements" asp-action="Delete" asp-route-id="@a.Id" method="post" onsubmit="return confirm('Видалити?')" style="margin:0;">
+                                    <button type="submit"
+                                            style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0.5px solid #fcc;border-radius:8px;background:transparent;color:#A32D2D;font-size:14px;cursor:pointer;transition:background 0.15s;"
+                                            onmouseover="this.style.background='#fff3f3'" onmouseout="this.style.background='transparent'"
+                                            title="Видалити">
+                                        ✕
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Context.Session.GetString("JwtToken") != null)
+        {
+            <div style="display:flex;justify-content:center;margin-top:40px;padding-top:32px;border-top:0.5px solid #e5e5e5;">
+                <a asp-controller="Announcements" asp-action="Create" class="btn-hero-dark" style="padding:14px 40px;font-size:14px;">
+                    + Розмістити оголошення
+                </a>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+
+        function loadSubCategories(categoryId, selectedSubId) {
+            const subSelect = document.getElementById('subCategorySelect');
+            subSelect.innerHTML = '<option value="">Всі підкатегорії</option>';
+            if (!categoryId) return;
+            fetch(`${apiBaseUrl}/api/Categories/${categoryId}/subcategories`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success && result.data) {
+                        result.data.forEach(sub => {
+                            const o = document.createElement('option');
+                            o.value = sub.id;
+                            o.textContent = sub.nameOfSubCategory;
+                            if (selectedSubId && sub.id == selectedSubId) o.selected = true;
+                            subSelect.appendChild(o);
+                        });
+                    }
+                });
+        }
+
+        document.getElementById('categorySelect').addEventListener('change', function () {
+            loadSubCategories(this.value, null);
+        });
+
+        const initialCategory = document.getElementById('categorySelect').value;
+        const initialSub = '@Model.SelectedSubCategoryId';
+        if (initialCategory && initialCategory !== '') {
+            loadSubCategories(initialCategory, initialSub);
+        }
+    </script>
+}

@@ -18,53 +18,9 @@ namespace NoticeBoardMVC.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int? categoryId, int? subCategoryId)
+        public IActionResult Index()
         {
-            var announcements = await apiService.GetAsync<List<AnnouncementViewModel>>("api/Announcements") ?? new();
-            var categories = await apiService.GetAsync<List<CategoryViewModel>>("api/Categories") ?? new();
-
-            if (categoryId.HasValue)
-            {
-                announcements = announcements
-                    .Where(a => a.NameOfCategory == categories
-                        .FirstOrDefault(c => c.Id == categoryId)?.NameOfCategory)
-                    .ToList();
-            }
-
-            if (subCategoryId.HasValue)
-            {
-                var subCategories = await apiService.GetAsync<List<SubCategoryViewModel>>(
-                    $"api/Categories/{categoryId}/subcategories") ?? new();
-
-                announcements = announcements
-                    .Where(a => a.NameOfSubCategory == subCategories
-                        .FirstOrDefault(s => s.Id == subCategoryId)?.NameOfSubCategory)
-                    .ToList();
-            }
-
-            var categoryItems = categories
-                .Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.NameOfCategory,
-                    Selected = c.Id == categoryId
-                }).ToList();
-
-            categoryItems.Insert(0, new SelectListItem
-            {
-                Value = "",
-                Text = "Всі категорії"
-            });
-
-            var model = new HomeViewModel
-            {
-                Announcements = announcements,
-                Categories = categoryItems,
-                SelectCategoryId = categoryId,
-                SelectSubCategoryId = subCategoryId
-            };
-
-            return View(model);
+            return View();
         }
 
         public IActionResult Privacy()

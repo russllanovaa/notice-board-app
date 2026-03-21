@@ -36,6 +36,15 @@ namespace NoticeBoardAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMy()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var responce = await _announcementService.GetByUserIdAsync(userId);
+            return Ok(responce);
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAnnouncementRequest request)
         {

@@ -29,6 +29,12 @@ namespace NoticeBoardAPI.Services
             return ServiceResponse<AnnouncementDto>.Ok(announcement);
         }
 
+        public async Task<ServiceResponse<IEnumerable<AnnouncementDto>>> GetByUserIdAsync(int userId)
+        {
+            var announcement = await _announcementRepository.GetByUserIdAsync(userId);
+            return ServiceResponse<IEnumerable<AnnouncementDto>>.Ok(announcement);
+        }
+
         public async Task<ServiceResponse<bool>> CreateAsync(int userId, CreateAnnouncementRequest request)
         {
             await _announcementRepository.CreateAsync(userId, request);

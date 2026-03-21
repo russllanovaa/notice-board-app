@@ -34,6 +34,16 @@ namespace NoticeBoardAPI.Repositories
                 );
         }
 
+        public async Task<IEnumerable<AnnouncementDto>> GetByUserIdAsync(int userId)
+        {
+            using var connection = _dbConnectionFactory.CreateConnection();
+            return await connection.QueryAsync<AnnouncementDto>(
+                "sp_GetAnnouncementsByUserId",
+                new { UserId = userId },
+                commandType: System.Data.CommandType.StoredProcedure
+            );
+        }
+
         public async Task CreateAsync(int userId, CreateAnnouncementRequest request)
         {
             using var connection = _dbConnectionFactory.CreateConnection();
